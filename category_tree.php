@@ -38,7 +38,7 @@ namespace CategoryTree {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             foreach ($result as &$row) {
                 if ($level === null || $level > 0) {
-                    $row['child'] = getChildNodes($pdo, $row['id'], $level - 1);
+                    $row['child'] = getChildNodes($pdo, $row['id'], ($level == null) ? null : $level - 1);
                 }
                 if (!empty($row['child'])) {
                     $row['isParent'] = true;
@@ -51,7 +51,7 @@ namespace CategoryTree {
 
         foreach ($result as &$row) {
             if ($level === null || $level > 0) {
-                $row['child'] = getChildNodes($pdo, $row['id'], $level - 1);
+                $row['child'] = getChildNodes($pdo, $row['id'], ($level == null) ? null : $level - 1);
             }
             if (!empty($row['child'])) {
                 $row['isParent'] = true;
@@ -77,7 +77,6 @@ namespace CategoryTree {
         // Привязка параметров
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':parent_id', $parentId);
-        echo var_dump($parentId);
         $stmt->bindParam(':description', $description);
 
         // Выполнение запроса на создание нового элемента
