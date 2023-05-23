@@ -3,16 +3,8 @@ include_once 'category_tree.php';
 include_once 'db.php';
 
 // Проверяем метод HTTP-запроса
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_action']) && $_POST['_action']=="edit") {
   
-  // Обработка запроса на создание нового элемента
-  $name = $_POST['name'] ?? '';
-  $description = $_POST['description'] ?? '';
-  $parent_id = $_POST['parent_id'] ?? '';
-  if (!empty($name)) {
-    \CategoryTree\Create(dbConn(), $name, $parent_id, $description);
-  }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_action']) && $_POST['_action']=="edit") {
   // Обработка запроса на обновление существующего элемента
   $id = $_POST['id'] ?? '';
   $name = $_POST['name'] ?? '';
@@ -27,7 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!empty($id)) {
       \CategoryTree\Delete(dbConn(), $id);
   }
-} 
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+  // Обработка запроса на создание нового элемента
+  $name = $_POST['name'] ?? '';
+  $description = $_POST['description'] ?? '';
+  $parent_id = $_POST['parent_id'] ?? '';
+  if (!empty($name)) {
+    \CategoryTree\Create(dbConn(), $name, $parent_id, $description);
+  }
+}
 
 $data = \CategoryTree\Get (dbConn(), null, null);
 
@@ -147,9 +148,9 @@ addButons.forEach(function (addButon) {
         </div>
         <div class="modal-body">
           <input type="hidden" name="parent_id" value="`+el_id+`">
-          <input name="name" class="form-control" placeholder="Название категории" type="text" id="name" value="`+el_name+`">
+          <input name="name" class="form-control" placeholder="Название категории" type="text" id="name">
           
-          <input name="description" class="form-control mt-2" placeholder="Описание" type="text" id="description" value="`+el_description+`">
+          <input name="description" class="form-control mt-2" placeholder="Описание" type="text" id="description">
         </div>
         <div class="modal-footer">
           <button type="button" id="mod-cancel" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
@@ -294,6 +295,10 @@ removeButons.forEach(function (removeButon) {
     } */
 </style>
 <script src="./libs/bootstrap.min.js"></script>
+
+<?php 
+// echo json_encode($data);
+?>
 
 </body>
 
