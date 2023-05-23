@@ -5,11 +5,13 @@ namespace CategoryTree {
     function Get($pdo, $id = null, $level = null)
     {
 
-        if($id == '')
-        $id = null;
+        if ($id == '') {
+            $id = null;
+        }
 
-        if($level == '')
-        $level = null;
+        if ($level == '') {
+            $level = null;
+        }
 
         $query = "SELECT id, name, parent_id, description FROM categories";
 
@@ -65,11 +67,13 @@ namespace CategoryTree {
 
     function Create($pdo, $name, $parentId, $description)
     {
-        if($parentId == '')
-        $parentId = null;
+        if ($parentId == '' || $parentId == '0' || $parentId == 0) {
+            $parentId = null;
+        }
 
-        if($name == '' || $name === null)
-        return;
+        if ($name == '' || $name === null) {
+            return;
+        }
 
         // Подготовка SQL-запроса для вставки нового элемента в таблицу дерева
         $stmt = $pdo->prepare("INSERT INTO categories (name, parent_id, description) VALUES (:name, :parent_id, :description)");
@@ -88,22 +92,34 @@ namespace CategoryTree {
 
     function Update($pdo, $id, $name, $parentId, $description)
     {
-        if($id == '')
-        return;
+        if ($id == '') {
+            return;
+        }
 
-        if($parentId == '')
-        $parentId = null;
+        if ($parentId == '') {
+            $parentId = null;
+        }
 
-        if($name == '' || $name === null)
-        return;
+        if ($name == '' || $name === null) {
+            return;
+        }
 
         // Подготовка SQL-запроса для обновления элемента дерева по ID
-        $stmt = $pdo->prepare("UPDATE categories SET name=:name, parent_id=:parent_id, description=:description WHERE id=:id");
+
+        $queryString = "UPDATE categories SET name=:name, ";
+
+        if (!($parentId === null)) {
+            $queryString .= "parent_id=:parent_id, ";
+        }
+
+        $queryString .= "description=:description WHERE id=:id";
+
+        $stmt = $pdo->prepare($queryString);
 
         // Привязка параметров
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':parent_id', $parentId);
+        if (!($parentId === null)) $stmt->bindParam(':parent_id', ($parentId == '0' || $parentId == 0) ? null : $parentId);
         $stmt->bindParam(':description', $description);
 
         // Выполнение запроса на обновление элемента
@@ -112,8 +128,9 @@ namespace CategoryTree {
 
     function Delete($pdo, $id)
     {
-        if($id == '')
-        return;
+        if ($id == '') {
+            return;
+        }
 
         // Получение дочерних элементов для данного элемента
         $stmt = $pdo->prepare("SELECT id FROM categories WHERE parent_id=:id");

@@ -2,34 +2,6 @@
 include_once 'category_tree.php';
 include_once 'db.php';
 
-// Проверяем метод HTTP-запроса
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_action']) && $_POST['_action']=="edit") {
-  
-  // Обработка запроса на обновление существующего элемента
-  $id = $_POST['id'] ?? '';
-  $name = $_POST['name'] ?? '';
-  $description = $_POST['description'] ?? '';
-  $parent_id = $_POST['parent_id'] ?? '';
-  if (!empty($id) && !empty($name)) {
-    \CategoryTree\Update(dbConn(), $id, $name, $parent_id, $description);
-  }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_action']) && $_POST['_action']=="delete") {
-  // Обработка запроса на удаление элемента
-  $id = $_POST['id'] ?? '';
-  if (!empty($id)) {
-      \CategoryTree\Delete(dbConn(), $id);
-  }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-  // Обработка запроса на создание нового элемента
-  $name = $_POST['name'] ?? '';
-  $description = $_POST['description'] ?? '';
-  $parent_id = $_POST['parent_id'] ?? '';
-  if (!empty($name)) {
-    \CategoryTree\Create(dbConn(), $name, $parent_id, $description);
-  }
-}
-
 $data = \CategoryTree\Get (dbConn(), null, null);
 
 function printCategory($category)
@@ -139,7 +111,7 @@ addButons.forEach(function (addButon) {
       el_description = "";
 
     showModal(`
-  <form method="POST" action="" class="modal" tabindex="-1" style="display: block">
+  <form method="POST" action="categories/add.php" class="modal" tabindex="-1" style="display: block">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -177,7 +149,7 @@ editButons.forEach(function (editButon) {
     if(el_description === null)
       el_description = "";
     showModal(`
-  <form method="POST" action="" class="modal" tabindex="-1" style="display: block">
+  <form method="POST" action="categories/edit.php" class="modal" tabindex="-1" style="display: block">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -187,7 +159,6 @@ editButons.forEach(function (editButon) {
         <div class="modal-body">
           <input type="hidden" name="id" value="`+el_id+`">
           <input name="name" class="form-control" placeholder="Название категории" type="text" id="name" value="`+el_name+`">
-          <input type="hidden" name="_action" value="edit">
           <input name="description" class="form-control mt-2" placeholder="Описание" type="text" id="description" value="`+el_description+`">
         </div>
         <div class="modal-footer">
@@ -212,7 +183,7 @@ removeButons.forEach(function (removeButon) {
     if(el_name === null)
       el_name = "";
     showModal(`
-  <form method="POST" action="" class="modal" tabindex="-1" style="display: block">
+  <form method="POST" action="categories/remove.php" class="modal" tabindex="-1" style="display: block">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -221,7 +192,6 @@ removeButons.forEach(function (removeButon) {
         </div>
           <span class="m-4 fs-5">Удалить категорию \"`+el_name+`\" ?</span>
           <input type="hidden" name="id" value="`+el_id+`">
-          <input type="hidden" name="_action" value="delete">
         <div class="modal-footer">
           <button type="button" id="mod-cancel" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
           <button type="submit" id="mod-ok" class="btn btn-primary">Ок</button>
